@@ -17,6 +17,6 @@ Have the script read from a file containing both single IP addresses and CIDR no
 192.224.113.15\
 199.60.28.111
 
-For the Expert Task here are two networks in CIDR notation:
+For the Expert Task here are two networks in CIDR notation:\
 20.128.0.0/16\
 208.76.44.0/22
