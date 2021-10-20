@@ -20,3 +20,9 @@ Have the script read from a file containing both single IP addresses and CIDR no
 For the Expert Task here are two networks in CIDR notation:\
 20.128.0.0/16\
 208.76.44.0/22
+
+
+## Usage
+The script accepts a list of IPs as shown in iplist.txt, it then generates a report file Scope_Results.txt in the working directory.  The organization (if applicable), City, Country, and GeoLocation (lat,long) is reported in the output file.
+
+`$ python3 scope.py iplist.txt`
