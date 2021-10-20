@@ -2,10 +2,12 @@
 # This solution completes the requirements for the Intermediate problem.
 import sys
 import ipinfo
+from re import search
+from netaddr import IPNetwork
 
 def ip_check(ip_arr):
     # Set the access token for ipinfo and initialize the token
-    access_token = '0xdead:beefx0'
+    access_token = 'fc9b91d877bf99'
     handler = ipinfo.getHandler(access_token)
     
     # Open the report file to be ready to write the results
@@ -13,15 +15,30 @@ def ip_check(ip_arr):
 
     # Iterate through the IP list from the file
     for ipaddr in ip_arr:
-        # Connect to ipinfo.io with the IP
-        details = handler.getDetails(ipaddr)
-        # Write the details out to the results file
-        f.write(ipaddr + "\n")
-        f.write("=" * 20)
-        # Writes the Organization, City, Country and geolocation.
-        f.write(details.org + "\n" + details.city + " " + details.country + "\n" + details.loc + "\n\n")
-    f.close()    
-
+        # Cidr check Expert mode
+        if search("/", str(ipaddr)):
+            # Expands the network for retrives the details from ipinfo.io
+            for ip in IPNetwork(ipaddr):
+                details = handler.getDetails(str(ip))
+                f.write(ipaddr + "\n")
+                f.write("=" * 20 + "\n")
+                if hasattr(details, 'org'):
+                    f.write(details.org + "\n" + details.city + " " + details.country + "\n" + details.loc + "\n\n")
+                else:
+                    f.write(details.city + " " + details.country + "\n" + details.loc + "\n\n")
+        else:
+            # Connect to ipinfo.io with the IP
+            details = handler.getDetails(ipaddr)
+            # Write the details out to the results file
+            f.write(ipaddr + "\n")
+            f.write("=" * 20 + "\n")
+            # Writes the Organization, City, Country and geolocation.
+            if hasattr(details, 'org'):
+                f.write(details.org + "\n" + details.city + " " + details.country + "\n" + details.loc + "\n\n")
+            else:
+                f.write(details.city + " " + details.country + "\n" + details.loc + "\n\n")
+    f.close()
+    return
 
 
 if __name__ == '__main__':
@@ -39,3 +56,4 @@ if __name__ == '__main__':
         ip_arr = [line.strip() for line in f.readlines()]
     
     ip_check(ip_arr)
+    exit()
