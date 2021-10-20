@@ -7,7 +7,7 @@ from netaddr import IPNetwork
 
 def ip_check(ip_arr):
     # Set the access token for ipinfo and initialize the token
-    access_token = 'fc9b91d877bf99'
+    access_token = '0xdead:beefx0'
     handler = ipinfo.getHandler(access_token)
     
     # Open the report file to be ready to write the results
