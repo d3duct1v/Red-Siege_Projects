@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# This solution completes the requirements for the Intermediate problem.
+# This solution completes all three difficulties for the problem.
 import sys
 import ipinfo
 from re import search
