@@ -38,6 +38,7 @@ def ip_check(ip_arr):
             else:
                 f.write(details.city + " " + details.country + "\n" + details.loc + "\n\n")
     f.close()
+    print("[+] Results in Scope_Results.txt")
     return
 
 
@@ -54,6 +55,10 @@ if __name__ == '__main__':
     # Open the file, iterate through the lines and strip the line feed
     with open(sys.argv[1], 'r') as f:
         ip_arr = [line.strip() for line in f.readlines()]
+    
+    print("[+] Running scoping on the following IPs: ")
+    for i in ip_arr:
+        print("    " + i)
     
     ip_check(ip_arr)
     exit()
