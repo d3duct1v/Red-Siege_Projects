@@ -46,7 +46,7 @@ if __name__ == '__main__':
     # Error catching for usage.
     if len(sys.argv) < 2:
         print("Provide a file with a list of IPs to check.")
-        print("$ scope.py file.txt")
+        print("$ scope.py IP_list.txt")
         exit()
     # Assign IP address from command line input.
     #ip = sys.argv[1] 
