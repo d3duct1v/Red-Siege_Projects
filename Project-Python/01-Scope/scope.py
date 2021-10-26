@@ -102,7 +102,8 @@ if __name__ == '__main__':
     requiredNamed = parser.add_argument_group('Required arguments')
     requiredNamed.add_argument('-o', '--outfile', dest="outtype", help='Output file type: csv or txt', required=True)
     requiredNamed.add_argument('-p', '--prefix', dest="fileprefix", help='Filename prefix.', required=True)
-    requiredNamed.add_argument('-i', '--infile', dest="infile", help='Input file containing a list of IPs to be scoped.', required=True)
+    requiredNamed.add_argument('-i', '--infile', dest="infile", 
+                               help='Input file containing a list of IPs to be scoped.', required=True)
     args = parser.parse_args()
 
     with open(args.infile, 'r') as f:
