@@ -22,6 +22,8 @@ def ip_validator(ip_arr, fileout, prefix):
         outfile = open(prefix + ".csv", 'a+', encoding="utf-8")
         writer = csv.writer(outfile)
         writer.writerow(headings)
+    else:
+        writer = prefix + ".txt"
     for i in ip_arr:
         if search("/", str(i)):
             try:
@@ -37,7 +39,8 @@ def ip_validator(ip_arr, fileout, prefix):
                     ip_check(i, fileout, writer)
             except ValueError:
                 print("[!] %r is not a valid IP address." % (i))
-    outfile.close()
+    if fileout == "csv":
+        outfile.close()
     return
 
 
@@ -51,26 +54,25 @@ def ip_check(valid, fileout, writer):
             if fileout == "csv":
                 write_csv(details, writer)
             else:
-                write_file(details)
+                write_file(details, writer)
     else:
         details = handler.getDetails(str(valid))
         if fileout == "csv":
             write_csv(details, writer)
         else:
-            write_file(details)
+            write_file(details, writer)
     return
 
 
-def write_file(details, prefix):
-    aname = prefix + ".txt"
+def write_file(details, writer):
     if hasattr(details, 'org'):
         pass
     else:
         details.org = "-"
-    f = open(aname, 'a')
+    f = open(writer, 'a+')
     f.write("[+] " + details.ip + "\n")
     f.write("    " + details.city + " " + details.region + ", " + details.country + " " + details.postal)
-    f.write("    " + details.loc + ", " + details.timezone + ", " + details.country_name)
+    f.write("    " + details.loc + ", " + details.timezone + ", " + details.country_name + "\n\n")
     f.close()
     return
 
