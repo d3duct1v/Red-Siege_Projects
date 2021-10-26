@@ -63,13 +63,14 @@ def ip_check(valid, fileout, writer):
 
 def write_file(details, prefix):
     aname = prefix + ".txt"
-    f = open(aname, 'a')
-    f.write(details.ip + "\n")
-    f.write("=" * 20 + "\n")
     if hasattr(details, 'org'):
-        f.write(details.org + "\n" + details.city + ", " + details.country + "\n" + details.loc + "\n\n")
+        pass
     else:
-        f.write(details.city + ", " + details.country + "\n" + details.loc + "\n\n")
+        details.org = "-"
+    f = open(aname, 'a')
+    f.write("[+] " + details.ip + "\n")
+    f.write("    " + details.city + " " + details.region + ", " + details.country + " " + details.postal)
+    f.write("    " + details.loc + ", " + details.timezone + ", " + details.country_name)
     f.close()
     return
 
