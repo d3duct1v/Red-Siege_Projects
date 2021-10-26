@@ -71,6 +71,7 @@ def write_file(details, writer):
         details.org = "-"
     f = open(writer, 'a+')
     f.write("[+] " + details.ip + "\n")
+    f.write("    " + details.org + "\n")
     f.write("    " + details.city + " " + details.region + ", " + details.country + " " + details.postal)
     f.write("    " + details.loc + ", " + details.timezone + ", " + details.country_name + "\n\n")
     f.close()
