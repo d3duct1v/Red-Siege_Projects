@@ -1,64 +1,113 @@
 #!/usr/bin/python3
-# This solution completes all three difficulties for the problem.
-import sys
+import argparse
+import csv
+import ipaddress
 import ipinfo
 from re import search
-from netaddr import IPNetwork
 
-def ip_check(ip_arr):
-    # Set the access token for ipinfo and initialize the token
+
+def ip_validator(ip_arr, fileout, prefix):
+    if fileout == "csv":
+        headings = ['ip',
+                    'org',
+                    'city',
+                    'region',
+                    'country',
+                    'postal',
+                    'loc',
+                    'timezone',
+                    'country_name',
+                    'latitude',
+                    'longitude']
+        outfile = open(prefix + ".csv", 'a+', encoding="utf-8")
+        writer = csv.writer(outfile)
+        writer.writerow(headings)
+    for i in ip_arr:
+        if search("/", str(i)):
+            try:
+                address = ipaddress.ip_network(i)
+                if address.version == 4 or address.version == 6:
+                    ip_check(i, fileout, writer)
+            except ValueError:
+                print("[!] %r is not a valid IP/Cidr address." % (i))
+        else:
+            try:
+                address = ipaddress.ip_address(i)
+                if address.version == 4 or address.version == 6:
+                    ip_check(i, fileout, writer)
+            except ValueError:
+                print("[!] %r is not a valid IP address." % (i))
+    outfile.close()
+    return
+
+
+def ip_check(valid, fileout, writer):
     access_token = '0xdead:beefx0'
     handler = ipinfo.getHandler(access_token)
-    
-    # Open the report file to be ready to write the results
-    f = open("Scope_Results.txt", "a")
 
-    # Iterate through the IP list from the file
-    for ipaddr in ip_arr:
-        # Cidr check Expert mode
-        if search("/", str(ipaddr)):
-            # Expands the network for retrives the details from ipinfo.io
-            for ip in IPNetwork(ipaddr):
-                details = handler.getDetails(str(ip))
-                f.write(ipaddr + "\n")
-                f.write("=" * 20 + "\n")
-                if hasattr(details, 'org'):
-                    f.write(details.org + "\n" + details.city + " " + details.country + "\n" + details.loc + "\n\n")
-                else:
-                    f.write(details.city + " " + details.country + "\n" + details.loc + "\n\n")
-        else:
-            # Connect to ipinfo.io with the IP
-            details = handler.getDetails(ipaddr)
-            # Write the details out to the results file
-            f.write(ipaddr + "\n")
-            f.write("=" * 20 + "\n")
-            # Writes the Organization, City, Country and geolocation.
-            if hasattr(details, 'org'):
-                f.write(details.org + "\n" + details.city + " " + details.country + "\n" + details.loc + "\n\n")
+    if search("/", str(valid)):
+        for ip in ipaddress.ip_network(valid):
+            details = handler.getDetails(str(ip))
+            if fileout == "csv":
+                write_csv(details, writer)
             else:
-                f.write(details.city + " " + details.country + "\n" + details.loc + "\n\n")
+                write_file(details)
+    else:
+        details = handler.getDetails(str(valid))
+        if fileout == "csv":
+            write_csv(details, writer)
+        else:
+            write_file(details)
+    return
+
+
+def write_file(details, prefix):
+    aname = prefix + ".txt"
+    f = open(aname, 'a')
+    f.write(details.ip + "\n")
+    f.write("=" * 20 + "\n")
+    if hasattr(details, 'org'):
+        f.write(details.org + "\n" + details.city + ", " + details.country + "\n" + details.loc + "\n\n")
+    else:
+        f.write(details.city + ", " + details.country + "\n" + details.loc + "\n\n")
     f.close()
-    print("[+] Results in Scope_Results.txt")
+    return
+
+
+def write_csv(details, writer):
+    if hasattr(details, 'org'):
+        pass
+    else:
+        details.org = "-"
+
+    writer.writerow([details.ip,
+                     details.org,
+                     details.city,
+                     details.region,
+                     details.country,
+                     details.postal,
+                     details.loc,
+                     details.timezone,
+                     details.country_name,
+                     details.latitude,
+                     details.longitude])
     return
 
 
 if __name__ == '__main__':
-    # Error catching for usage.
-    if len(sys.argv) < 2:
-        print("Provide a file with a list of IPs to check.")
-        print("$ scope.py IP_list.txt")
-        exit()
-    # Assign IP address from command line input.
-    #ip = sys.argv[1] 
+    parser = argparse.ArgumentParser()
+    requiredNamed = parser.add_argument_group('Required arguments')
+    requiredNamed.add_argument('-o', '--outfile', dest="outtype", help='Output file type: csv or txt', required=True)
+    requiredNamed.add_argument('-p', '--prefix', dest="fileprefix", help='Filename prefix.', required=True)
+    requiredNamed.add_argument('-i', '--infile', dest="infile", help='Input file containing a list of IPs to be scoped.', required=True)
+    args = parser.parse_args()
 
-    # Read IPs from a file
-    # Open the file, iterate through the lines and strip the line feed
-    with open(sys.argv[1], 'r') as f:
+    with open(args.infile, 'r') as f:
         ip_arr = [line.strip() for line in f.readlines()]
-    
-    print("[+] Running scoping on the following IPs: ")
+
+    print("[+] Running scope checking on the following IPs:")
     for i in ip_arr:
         print("    " + i)
-    
-    ip_check(ip_arr)
+
+    ip_validator(ip_arr, args.outtype, args.fileprefix)
     exit()
